@@ -59,6 +59,10 @@ public class Employee {
         this.jobPosition = jobPosition;
     }
 
+    public String getName() {
+        return getFirstName() + " " + getSecondName();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

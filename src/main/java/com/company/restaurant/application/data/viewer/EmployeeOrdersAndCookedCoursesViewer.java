@@ -28,7 +28,7 @@ public class EmployeeOrdersAndCookedCoursesViewer
         // Show employee orders
 
         // Show employee cooked courses
-        employeeCookedCourseTableList.displayObjectList();
+        employeeCookedCourseTableList.displayItemList(employee);
 
         return null;
     }
