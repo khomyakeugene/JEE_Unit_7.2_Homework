@@ -1,5 +1,8 @@
 package com.company.restaurant.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by Yevhen on 19.05.2016.
  */
@@ -9,6 +12,7 @@ public class Course {
     private Float weight;
     private Float cost;
     private CourseCategory courseCategory = new CourseCategory();
+    private Set<CourseIngredient> courseIngredients = new HashSet<>();
 
     public int getCourseId() {
         return courseId;
@@ -48,6 +52,14 @@ public class Course {
 
     public void setCourseCategory(CourseCategory courseCategory) {
         this.courseCategory = courseCategory;
+    }
+
+    public Set<CourseIngredient> getCourseIngredients() {
+        return courseIngredients;
+    }
+
+    public void setCourseIngredients(Set<CourseIngredient> courseIngredients) {
+        this.courseIngredients = courseIngredients;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.company.restaurant.controllers;
+package com.company.restaurant.controllers.impl;
 
 import com.company.restaurant.dao.StateGraphDao;
 import com.company.restaurant.model.StateGraph;

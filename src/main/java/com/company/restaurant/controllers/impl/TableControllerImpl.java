@@ -1,11 +1,13 @@
-package com.company.restaurant.controllers;
+package com.company.restaurant.controllers.impl;
 
+import com.company.restaurant.controllers.TableController;
+import com.company.restaurant.controllers.impl.proto.Controller;
 import com.company.restaurant.dao.TableDao;
 import com.company.restaurant.model.Table;
 
 import java.util.List;
 
-public class TableControllerImpl implements TableController {
+public class TableControllerImpl extends Controller implements TableController {
     private TableDao tableDao;
 
     public void setTableDao(TableDao tableDao) {

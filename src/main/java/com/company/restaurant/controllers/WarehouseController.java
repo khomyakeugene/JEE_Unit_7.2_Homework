@@ -14,6 +14,8 @@ public interface WarehouseController {
 
     void takeIngredientFromWarehouse(Ingredient ingredient, Portion portion, float amount);
 
+    Warehouse findIngredientInWarehouse(Ingredient ingredient, Portion portion);
+
     List<Warehouse> findIngredientInWarehouseByName(String name);
 
     List<Warehouse> findIngredientInWarehouseById(int ingredientId);

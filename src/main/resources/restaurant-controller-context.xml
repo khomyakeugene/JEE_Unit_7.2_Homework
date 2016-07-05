@@ -6,42 +6,44 @@
 
     <import resource="classpath*:restaurant-hibernate-context.xml"/>
 
-    <bean class="com.company.restaurant.controllers.StateGraphRules" id="stateGraphRules">
+    <bean class="com.company.restaurant.controllers.impl.StateGraphRules" id="stateGraphRules">
         <property name="stateGraphDao" ref="stateGraphDao"/>
     </bean>
 
 
-    <bean class="com.company.restaurant.controllers.MenuControllerImpl" id="menuController">
+    <bean class="com.company.restaurant.controllers.impl.MenuControllerImpl" id="menuController">
         <property name="menuDao" ref="menuDao"/>
     </bean>
 
-    <bean class="com.company.restaurant.controllers.TableControllerImpl" id="tableController">
+    <bean class="com.company.restaurant.controllers.impl.TableControllerImpl" id="tableController">
         <property name="tableDao" ref="tableDao"/>
     </bean>
 
-    <bean class="com.company.restaurant.controllers.EmployeeControllerImpl" id="employeeController">
+    <bean class="com.company.restaurant.controllers.impl.EmployeeControllerImpl" id="employeeController">
         <property name="jobPositionDao" ref="jobPositionDao"/>
         <property name="employeeDao" ref="employeeDao"/>
     </bean>
 
-    <bean class="com.company.restaurant.controllers.CourseControllerImpl" id="courseController">
+    <bean class="com.company.restaurant.controllers.impl.CourseControllerImpl" id="courseController">
         <property name="courseCategoryDao" ref="courseCategoryDao"/>
         <property name="courseDao" ref="courseDao"/>
     </bean>
 
-    <bean class="com.company.restaurant.controllers.OrderControllerImpl" id="orderController">
+    <bean class="com.company.restaurant.controllers.impl.OrderControllerImpl" id="orderController">
         <property name="orderDao" ref="orderDao"/>
         <property name="stateGraphRules" ref="stateGraphRules"/>
     </bean>
 
-    <bean class="com.company.restaurant.controllers.WarehouseControllerImpl" id="warehouseController">
+    <bean class="com.company.restaurant.controllers.impl.WarehouseControllerImpl" id="warehouseController">
         <property name="ingredientDao" ref="ingredientDao"/>
         <property name="portionDao" ref="portionDao"/>
         <property name="warehouseDao" ref="warehouseDao"/>
     </bean>
 
-    <bean class="com.company.restaurant.controllers.KitchenControllerImpl" id="kitchenController">
+    <bean class="com.company.restaurant.controllers.impl.KitchenControllerImpl" id="kitchenController">
+        <property name="disableCourseWithoutIngredients" value="false"/>
         <property name="cookedCourseDao" ref="cookedCourseDao"/>
+        <property name="warehouseController" ref="warehouseController"/>
     </bean>
     <!-- END OF DB-CONTEXT -->
 </beans>

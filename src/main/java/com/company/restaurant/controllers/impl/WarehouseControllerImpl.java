@@ -1,5 +1,7 @@
-package com.company.restaurant.controllers;
+package com.company.restaurant.controllers.impl;
 
+import com.company.restaurant.controllers.WarehouseController;
+import com.company.restaurant.controllers.impl.proto.Controller;
 import com.company.restaurant.dao.IngredientDao;
 import com.company.restaurant.dao.PortionDao;
 import com.company.restaurant.dao.WarehouseDao;
@@ -9,7 +11,7 @@ import com.company.restaurant.model.Warehouse;
 
 import java.util.List;
 
-public class WarehouseControllerImpl implements WarehouseController {
+public class WarehouseControllerImpl extends Controller implements WarehouseController {
     private WarehouseDao warehouseDao;
     private IngredientDao ingredientDao;
     private PortionDao portionDao;
@@ -38,6 +40,11 @@ public class WarehouseControllerImpl implements WarehouseController {
         if (amount > 0.0) {
             warehouseDao.takeIngredientFromWarehouse(ingredient, portion, amount);
         }
+    }
+
+    @Override
+    public Warehouse findIngredientInWarehouse(Ingredient ingredient, Portion portion) {
+        return warehouseDao.findIngredientInWarehouse(ingredient, portion);
     }
 
     @Override

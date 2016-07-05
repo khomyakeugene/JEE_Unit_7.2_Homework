@@ -59,6 +59,9 @@
     <bean class="com.company.restaurant.application.data.list.EmployeeCookedCourseTableList" id="employeeCookedCourseTableList">
         <property name="employeeController" ref="employeeController"/>
     </bean>
+    <bean class="com.company.restaurant.application.data.list.EmployeeOrderTableList" id="employeeOrderTableList">
+        <property name="employeeController" ref="employeeController"/>
+    </bean>
 
     <bean class="com.company.restaurant.application.data.chooser.CourseCategoryChooser" id="courseCategoryChooser">
         <property name="courseController" ref="courseController"/>
@@ -206,8 +209,9 @@
 
     <bean class="com.company.restaurant.application.data.viewer.EmployeeOrdersAndCookedCoursesViewer"
           id="employeeOrdersAndCookedCoursesView">
-        <property name="employeeCookedCourseTableList" ref="employeeCookedCourseTableList"/>
         <property name="objectChooser" ref="employeeChooser"/>
+        <property name="employeeCookedCourseTableList" ref="employeeCookedCourseTableList"/>
+        <property name="employeeOrderTableList" ref="employeeOrderTableList"/>
     </bean>
 
     <bean class="com.company.restaurant.application.data.remover.CourseRemover" id="courseRemover">
@@ -278,6 +282,7 @@
                                         <property name="executor" ref="employeeOrdersAndCookedCoursesView"/>
                                     </bean>
                                 </entry>
+
                                 <entry key="6">
                                     <bean class="com.company.restaurant.application.service.SimpleMenuItem">
                                         <property name="itemText" value="Exit"/>

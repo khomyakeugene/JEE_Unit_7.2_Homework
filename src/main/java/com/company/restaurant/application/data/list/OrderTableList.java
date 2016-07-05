@@ -4,6 +4,7 @@ import com.company.restaurant.application.data.list.proto.ObjectTableList;
 import com.company.restaurant.application.data.list.proto.ObjectTableListProto;
 import com.company.restaurant.controllers.OrderController;
 import com.company.restaurant.model.Order;
+import com.company.util.Util;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,7 +14,8 @@ import java.util.Collection;
  * Created by Yevhen on 28.05.2016.
  */
 public class OrderTableList extends ObjectTableListProto<Order> implements ObjectTableList<Order> {
-    private static final String[] listHeader = new String[] {
+    public static final String THERE_ARE_NO_ORDERS_MESSAGE = "There are no orders";
+    public static final String[] listHeader = new String[] {
             "Order Id",
             "Order number",
             "Order datetime",
@@ -28,25 +30,29 @@ public class OrderTableList extends ObjectTableListProto<Order> implements Objec
         this.orderController = orderController;
     }
 
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
     @Override
     protected String[] getListHeader() {
         return listHeader;
     }
 
-    @Override
-    protected String[] dataSetRowDataToStringArray(Order order) {
+    public static String[] getOrderRowData(Order order) {
         ArrayList<String> arrayList = new ArrayList<>();
 
         arrayList.add(Integer.toString(order.getOrderId()));
         arrayList.add(order.getOrderNumber());
         arrayList.add(simpleDateFormat.format(order.getOrderDatetime().getTime()));
         arrayList.add(order.getState().getName());
-        arrayList.add(order.getWaiter().getFirstName() + " " + order.getWaiter().getSecondName());
+        arrayList.add(order.getWaiter().getName());
         arrayList.add(Integer.toString(order.getTable().getNumber()));
 
         return arrayList.toArray(new String[arrayList.size()]);
+    }
+
+    @Override
+    protected String[] dataSetRowDataToStringArray(Order order) {
+        return getOrderRowData(order);
     }
 
     @Override
@@ -54,4 +60,8 @@ public class OrderTableList extends ObjectTableListProto<Order> implements Objec
         return orderController.findAllOrders();
     }
 
+    @Override
+    protected void listDataHasNotBeenFoundMessage() {
+        Util.printMessage(THERE_ARE_NO_ORDERS_MESSAGE);
+    }
 }

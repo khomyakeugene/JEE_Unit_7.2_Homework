@@ -1,5 +1,7 @@
-package com.company.restaurant.controllers;
+package com.company.restaurant.controllers.impl;
 
+import com.company.restaurant.controllers.CourseController;
+import com.company.restaurant.controllers.impl.proto.Controller;
 import com.company.restaurant.dao.CourseCategoryDao;
 import com.company.restaurant.dao.CourseDao;
 import com.company.restaurant.model.Course;
@@ -7,7 +9,7 @@ import com.company.restaurant.model.CourseCategory;
 
 import java.util.List;
 
-public class CourseControllerImpl implements CourseController {
+public class CourseControllerImpl extends Controller implements CourseController {
     private CourseCategoryDao courseCategoryDao;
     private CourseDao courseDao;
 

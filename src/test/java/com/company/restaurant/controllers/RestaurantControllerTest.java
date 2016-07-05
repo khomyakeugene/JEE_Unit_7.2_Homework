@@ -1,8 +1,6 @@
 package com.company.restaurant.controllers;
 
-import com.company.restaurant.controllers.*;
 import com.company.restaurant.dao.*;
-import com.company.restaurant.dao.Util;
 import com.company.restaurant.model.*;
 import com.company.util.DataIntegrityException;
 import org.junit.AfterClass;
@@ -69,9 +67,9 @@ public abstract class RestaurantControllerTest {
 
     private static Course prepareTestCourse() {
         testCourse = new Course();
-        testCourse.setName(com.company.restaurant.dao.Util.getRandomString());
-        testCourse.setWeight(com.company.restaurant.dao.Util.getRandomFloat());
-        testCourse.setCost(com.company.restaurant.dao.Util.getRandomFloat());
+        testCourse.setName(Util.getRandomString());
+        testCourse.setWeight(Util.getRandomFloat());
+        testCourse.setCost(Util.getRandomFloat());
         testCourse.setCourseCategory(courseCategoryDao.findCourseCategoryById(courseCategoryId()));
 
         testCourse = courseController.addCourse(testCourse);
@@ -85,7 +83,7 @@ public abstract class RestaurantControllerTest {
 
     private static void prepareClosedOrder() throws Exception {
         Order order = new Order();
-        order.setOrderNumber(com.company.restaurant.dao.Util.getRandomString());
+        order.setOrderNumber(Util.getRandomString());
         order.setTable(tableDao.findTableById(tableId()));
         order.setWaiter(employeeDao.findEmployeeById(employeeId()));
         order.setState(stateDao.findStateByType("A"));
@@ -94,16 +92,16 @@ public abstract class RestaurantControllerTest {
 
         // Courses for closed order ----------------------------
         closedOrderCourse1 = new Course();
-        closedOrderCourse1.setName(com.company.restaurant.dao.Util.getRandomString());
-        closedOrderCourse1.setWeight(com.company.restaurant.dao.Util.getRandomFloat());
-        closedOrderCourse1.setCost(com.company.restaurant.dao.Util.getRandomFloat());
+        closedOrderCourse1.setName(Util.getRandomString());
+        closedOrderCourse1.setWeight(Util.getRandomFloat());
+        closedOrderCourse1.setCost(Util.getRandomFloat());
         closedOrderCourse1.setCourseCategory(courseCategoryDao.findCourseCategoryById(courseCategoryId()));
         closedOrderCourse1 = courseController.addCourse(closedOrderCourse1);
 
         closedOrderCourse2 = new Course();
-        closedOrderCourse2.setName(com.company.restaurant.dao.Util.getRandomString());
-        closedOrderCourse2.setWeight(com.company.restaurant.dao.Util.getRandomFloat());
-        closedOrderCourse2.setCost(com.company.restaurant.dao.Util.getRandomFloat());
+        closedOrderCourse2.setName(Util.getRandomString());
+        closedOrderCourse2.setWeight(Util.getRandomFloat());
+        closedOrderCourse2.setCost(Util.getRandomFloat());
         closedOrderCourse2.setCourseCategory(courseCategoryDao.findCourseCategoryById(courseCategoryId()));
         closedOrderCourse2 = courseController.addCourse(closedOrderCourse2);
         // ----------
@@ -169,7 +167,7 @@ public abstract class RestaurantControllerTest {
 
     @Test(timeout = 2000)
     public void addFindDelJobPosition() throws Exception {
-        String name = com.company.restaurant.dao.Util.getRandomString();
+        String name = Util.getRandomString();
         JobPosition jobPosition = employeeController.addJobPosition(name);
 
         assertTrue(jobPosition.equals(employeeController.findJobPositionByName(jobPosition.getName())));
@@ -185,13 +183,13 @@ public abstract class RestaurantControllerTest {
 
     @Test(timeout = 2000)
     public void addFindDelEmployeeTest() throws Exception {
-        String firstName = com.company.restaurant.dao.Util.getRandomString();
-        String secondName = com.company.restaurant.dao.Util.getRandomString();
+        String firstName = Util.getRandomString();
+        String secondName = Util.getRandomString();
         Employee employee = new Employee();
         employee.setFirstName(firstName);
         employee.setSecondName(secondName);
-        employee.setPhoneNumber(com.company.restaurant.dao.Util.getRandomString());
-        employee.setSalary(com.company.restaurant.dao.Util.getRandomFloat());
+        employee.setPhoneNumber(Util.getRandomString());
+        employee.setSalary(Util.getRandomFloat());
         employee.setJobPosition(jobPositionDao.findJobPositionById(jobPositionId()));
         employee = employeeController.addEmployee(employee);
         int employeeId = employee.getEmployeeId();
@@ -211,7 +209,7 @@ public abstract class RestaurantControllerTest {
 
     @Test(timeout = 2000)
     public void addFindDelCourseCategoryTest() throws Exception {
-        String name = com.company.restaurant.dao.Util.getRandomString();
+        String name = Util.getRandomString();
         CourseCategory courseCategory = courseController.addCourseCategory(name);
 
         assertTrue(courseCategory.equals(courseController.findCourseCategoryByName(courseCategory.getName())));
@@ -225,11 +223,11 @@ public abstract class RestaurantControllerTest {
 
     @Test(timeout = 2000)
     public void addFindDelCourseTest() throws Exception {
-        String name = com.company.restaurant.dao.Util.getRandomString();
+        String name = Util.getRandomString();
         Course course = new Course();
         course.setName(name);
-        course.setWeight(com.company.restaurant.dao.Util.getRandomFloat());
-        course.setCost(com.company.restaurant.dao.Util.getRandomFloat());
+        course.setWeight(Util.getRandomFloat());
+        course.setCost(Util.getRandomFloat());
         course.setCourseCategory(courseCategoryDao.findCourseCategoryById(courseCategoryId()));
         course = courseController.addCourse(course);
 
@@ -252,7 +250,7 @@ public abstract class RestaurantControllerTest {
 
     @Test(timeout = 2000)
     public void addFindDelMenuTest() throws Exception {
-        String name = com.company.restaurant.dao.Util.getRandomString();
+        String name = Util.getRandomString();
         Menu menu = menuController.addMenu(name);
 
         assertTrue(menu.equals(menuController.findMenuByName(name)));
@@ -260,16 +258,16 @@ public abstract class RestaurantControllerTest {
 
         // Courses in menu ----------------------------
         Course course1 = new Course();
-        course1.setName(com.company.restaurant.dao.Util.getRandomString());
-        course1.setWeight(com.company.restaurant.dao.Util.getRandomFloat());
-        course1.setCost(com.company.restaurant.dao.Util.getRandomFloat());
+        course1.setName(Util.getRandomString());
+        course1.setWeight(Util.getRandomFloat());
+        course1.setCost(Util.getRandomFloat());
         course1.setCourseCategory(courseCategoryDao.findCourseCategoryById(courseCategoryId()));
         course1 = courseController.addCourse(course1);
 
         Course course2 = new Course();
-        course2.setName(com.company.restaurant.dao.Util.getRandomString());
-        course2.setWeight(com.company.restaurant.dao.Util.getRandomFloat());
-        course2.setCost(com.company.restaurant.dao.Util.getRandomFloat());
+        course2.setName(Util.getRandomString());
+        course2.setWeight(Util.getRandomFloat());
+        course2.setCost(Util.getRandomFloat());
         course2.setCourseCategory(courseCategoryDao.findCourseCategoryById(courseCategoryId()));
         course2 = courseController.addCourse(course2);
 
@@ -297,11 +295,11 @@ public abstract class RestaurantControllerTest {
     @Test(timeout = 2000)
     public void addFindDelTableTest() throws Exception {
         Table table = new Table();
-        table.setDescription(com.company.restaurant.dao.Util.getRandomString());
+        table.setDescription(Util.getRandomString());
         boolean tableWasNotAdded = true;
         do {
             try {
-                table.setNumber(tableController.findTableById(lastTableId()).getNumber() + com.company.restaurant.dao.Util.getRandomInteger());
+                table.setNumber(tableController.findTableById(lastTableId()).getNumber() + Util.getRandomInteger());
                 table = tableController.addTable(table);
                 tableWasNotAdded = false;
             } catch (RuntimeException e) {
@@ -323,7 +321,7 @@ public abstract class RestaurantControllerTest {
     @Test (timeout = 2000)
     public void addFindDelOrderTest() throws Exception {
         Order order = new Order();
-        order.setOrderNumber(com.company.restaurant.dao.Util.getRandomString());
+        order.setOrderNumber(Util.getRandomString());
         order.setTable(tableDao.findTableById(tableId()));
         order.setWaiter(employeeDao.findEmployeeById(employeeId()));
         order.setState(stateDao.findStateByType("A"));
@@ -336,16 +334,16 @@ public abstract class RestaurantControllerTest {
 
         // Courses in order ----------------------------
         Course course1 = new Course();
-        course1.setName(com.company.restaurant.dao.Util.getRandomString());
-        course1.setWeight(com.company.restaurant.dao.Util.getRandomFloat());
-        course1.setCost(com.company.restaurant.dao.Util.getRandomFloat());
+        course1.setName(Util.getRandomString());
+        course1.setWeight(Util.getRandomFloat());
+        course1.setCost(Util.getRandomFloat());
         course1.setCourseCategory(courseCategoryDao.findCourseCategoryById(courseCategoryId()));
         course1 = courseController.addCourse(course1);
 
         Course course2 = new Course();
-        course2.setName(com.company.restaurant.dao.Util.getRandomString());
-        course2.setWeight(com.company.restaurant.dao.Util.getRandomFloat());
-        course2.setCost(com.company.restaurant.dao.Util.getRandomFloat());
+        course2.setName(Util.getRandomString());
+        course2.setWeight(Util.getRandomFloat());
+        course2.setCost(Util.getRandomFloat());
         course2.setCourseCategory(courseCategoryDao.findCourseCategoryById(courseCategoryId()));
         course2 = courseController.addCourse(course2);
 
@@ -391,14 +389,14 @@ public abstract class RestaurantControllerTest {
     @Test(timeout = 2000)
     public void addDelCookedCourse() throws Exception {
         Course testCourse = new Course();
-        testCourse.setName(com.company.restaurant.dao.Util.getRandomString());
-        testCourse.setWeight(com.company.restaurant.dao.Util.getRandomFloat());
-        testCourse.setCost(com.company.restaurant.dao.Util.getRandomFloat());
+        testCourse.setName(Util.getRandomString());
+        testCourse.setWeight(Util.getRandomFloat());
+        testCourse.setCost(Util.getRandomFloat());
         testCourse.setCourseCategory(courseCategoryDao.findCourseCategoryById(courseCategoryId()));
         testCourse = courseController.addCourse(testCourse);
 
         CookedCourse cookedCourse = kitchenController.addCookedCourse(testCourse, employee(),
-                com.company.restaurant.dao.Util.getRandomFloat());
+                Util.getRandomFloat());
 
         kitchenController.findAllCookedCourses().forEach(System.out::println);
 
@@ -411,7 +409,7 @@ public abstract class RestaurantControllerTest {
     public void addFindDelWarehouseTest() throws Exception {
         for (Ingredient ingredient: warehouseController.findAllIngredients()) {
             for (Portion portion : warehouseController.findAllPortions()) {
-                float amountToAdd = com.company.restaurant.dao.Util.getRandomFloat();
+                float amountToAdd = Util.getRandomFloat();
                 warehouseController.addIngredientToWarehouse(ingredient, portion, amountToAdd);
                 float amountToTake = Util.getRandomFloat();
                 warehouseController.takeIngredientFromWarehouse(ingredient, portion, amountToTake);

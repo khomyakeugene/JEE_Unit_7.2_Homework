@@ -167,7 +167,10 @@ public abstract class RestaurantModelDaoTest {
         courseDao.delCourse(name);
 
         // Whole course list
-        courseDao.findAllCourses().forEach(System.out::println);
+        courseDao.findAllCourses().forEach(c -> {
+            System.out.println(c);
+            c.getCourseIngredients().forEach(System.out::println);
+        });
     }
 
     @Test(timeout = 2000)

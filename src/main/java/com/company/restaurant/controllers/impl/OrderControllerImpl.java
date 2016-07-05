@@ -1,5 +1,7 @@
-package com.company.restaurant.controllers;
+package com.company.restaurant.controllers.impl;
 
+import com.company.restaurant.controllers.OrderController;
+import com.company.restaurant.controllers.impl.proto.Controller;
 import com.company.restaurant.dao.OrderDao;
 import com.company.restaurant.model.Course;
 import com.company.restaurant.model.Order;
@@ -10,7 +12,7 @@ import java.util.List;
 /**
  * Created by Yevhen on 22.05.2016.
  */
-public class OrderControllerImpl implements OrderController {
+public class OrderControllerImpl extends Controller implements OrderController {
     private static final String IMPOSSIBLE_TO_DELETE_ORDER_PATTERN =
             "It is impossible to delete order in <%s> state (<order_id> = %d)!";
     private static final String IMPOSSIBLE_TO_ADD_COURSE_TO_ORDER_PATTERN =
@@ -48,10 +50,6 @@ public class OrderControllerImpl implements OrderController {
 
     private boolean isFillingActionEnabled(Order order) {
         return stateGraphRules.isFillingActionEnabled(orderDao.orderEntityName(), order.getState().getType());
-    }
-
-    private void errorMessage(String message) {
-        throw new DataIntegrityException(message);
     }
 
     @Override
@@ -110,7 +108,7 @@ public class OrderControllerImpl implements OrderController {
                 orderDao.addCourseToOrder(order, course);
             } else {
                 // Perhaps, to raise exception seems to be unnecessary and excessive, but let use such a "mechanism"!
-                errorMessage(String.format(
+                throwDataIntegrityException(String.format(
                         IMPOSSIBLE_TO_ADD_COURSE_TO_ORDER_PATTERN, order.getState().getName(), order.getOrderId()));
             }
         } catch (Exception e) {
@@ -128,7 +126,7 @@ public class OrderControllerImpl implements OrderController {
             if (isFillingActionEnabled(order)) {
                 orderDao.takeCourseFromOrder(order, course);
             } else {
-                errorMessage(String.format(
+                throwDataIntegrityException(String.format(
                         IMPOSSIBLE_TO_DEL_COURSE_FROM_ORDER_PATTERN, order.getState().getName(), order.getOrderId()));
             }
         } catch (Exception e) {
