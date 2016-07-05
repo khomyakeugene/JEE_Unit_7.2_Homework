@@ -65,7 +65,7 @@ public abstract class HDaoEntity<T> {
     }
 
     protected T newObject() {
-        Class entityClass = getEntityClass();
+        Class<? extends T> entityClass = getEntityClass();
 
         T object;
         try {
@@ -267,7 +267,7 @@ public abstract class HDaoEntity<T> {
     }
 
 
-    protected Set<T> findObjectSetByAttributeValue(String attributeName, Object value) {
+    protected Set<T> findObjectSetByAttributeValue(String attributeName, com.company.restaurant.model.Course value) {
         HashSet<T> result = new HashSet<>();
         result.addAll(findObjectsByAttributeValue(attributeName, value));
 
@@ -275,7 +275,7 @@ public abstract class HDaoEntity<T> {
     }
 
 
-    protected T findObjectByAttributeValue(String attributeName, Object value) {
+    protected T findObjectByAttributeValue(String attributeName, Serializable value) {
         return getFirstFromList(findObjectsByAttributeValue(attributeName, value));
     }
 
