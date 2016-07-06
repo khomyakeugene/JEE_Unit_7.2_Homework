@@ -65,7 +65,7 @@ public abstract class HDaoEntity<T> {
     }
 
     protected T newObject() {
-        Class<? extends T> entityClass = getEntityClass();
+        Class entityClass = getEntityClass();
 
         T object;
         try {
@@ -150,6 +150,7 @@ public abstract class HDaoEntity<T> {
         // "non deprecated" method :( ; at least, don't understand how can use, for example,
         // sessionFactory.getMetamodel() approaching the same aim ...
         ClassMetadata classMetadata = sessionFactory.getClassMetadata(getEntityClass());
+        // ClassMetadata classMetadata = sessionFactory.getMetamodel().
         if (classMetadata instanceof AbstractEntityPersister) {  // And what I have to do if "not instnceof ..."?
             AbstractEntityPersister abstractEntityPersister = (AbstractEntityPersister) classMetadata;
             result = abstractEntityPersister.getTableName();
@@ -267,7 +268,7 @@ public abstract class HDaoEntity<T> {
     }
 
 
-    protected Set<T> findObjectSetByAttributeValue(String attributeName, com.company.restaurant.model.Course value) {
+    protected Set<T> findObjectSetByAttributeValue(String attributeName, Object value) {
         HashSet<T> result = new HashSet<>();
         result.addAll(findObjectsByAttributeValue(attributeName, value));
 
@@ -275,7 +276,7 @@ public abstract class HDaoEntity<T> {
     }
 
 
-    protected T findObjectByAttributeValue(String attributeName, Serializable value) {
+    protected T findObjectByAttributeValue(String attributeName, Object value) {
         return getFirstFromList(findObjectsByAttributeValue(attributeName, value));
     }
 
