@@ -363,8 +363,11 @@ public abstract class RestaurantControllerTest {
         courseController.delCourse(course2);
         // ----------------------------
 
+        System.out.println("All orders:");
         orderController.findAllOrders().forEach(System.out::println);
+        System.out.println("Open orders:");
         orderController.findAllOpenOrders().forEach(System.out::println);
+        System.out.println("Closed orders:");
         orderController.findAllClosedOrders().forEach(System.out::println);
 
         orderController.delOrder(order);
