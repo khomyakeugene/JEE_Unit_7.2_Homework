@@ -9,6 +9,9 @@ import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.persister.entity.AbstractEntityPersister;
 import org.hibernate.query.Query;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 import java.io.Serializable;
@@ -29,21 +32,41 @@ public abstract class HDaoEntity<T> {
 
     private Class<T> entityClass;
     private SessionFactory sessionFactory;
+    private boolean useCriteriaQuery;
 
     protected String nameAttributeName = NAME_ATTRIBUTE_NAME;
-    protected String orderByCondition;
+    protected String orderByAttributeName;
 
     public HDaoEntity() {
         initMetadata();
     }
 
-    protected abstract void initMetadata();
+    // Could be overridden in subclasses
+    protected void initMetadata() {
+
+    }
+
+    public String getOrderByAttributeName() {
+        if (orderByAttributeName == null) {
+            orderByAttributeName = getEntityIdAttributeName();
+        }
+
+        return orderByAttributeName;
+    }
+
+    protected boolean isUseCriteriaQuery() {
+        return useCriteriaQuery;
+    }
 
     public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
-    protected T getFirstFromList(List<T> objects) {
+    public void setUseCriteriaQuery(boolean useCriteriaQuery) {
+        this.useCriteriaQuery = useCriteriaQuery;
+    }
+
+    private T getFirstFromList(List<T> objects) {
         return (objects != null && objects.size() > 0) ? objects.get(0) : null;
     }
 
@@ -52,7 +75,7 @@ public abstract class HDaoEntity<T> {
                 getActualTypeArguments()[0]);
     }
 
-    protected Class<T> getEntityClass() {
+    private Class<T> getEntityClass() {
         if (entityClass == null) {
             entityClass = getGenericClass();
         }
@@ -65,7 +88,7 @@ public abstract class HDaoEntity<T> {
     }
 
     protected T newObject() {
-        Class entityClass = getEntityClass();
+        Class<? extends T> entityClass = getEntityClass();
 
         T object;
         try {
@@ -122,23 +145,32 @@ public abstract class HDaoEntity<T> {
         return sessionFactory.getCurrentSession();
     }
 
+    protected CriteriaBuilder getCriteriaBuilder() {
+        return sessionFactory.getCriteriaBuilder();
+    }
+
+    protected CriteriaQuery<T> createCriteriaQuery() {
+        return getCriteriaBuilder().createQuery(getEntityClass());
+    }
+
+    protected List<T> getCriteriaQueryResultList(CriteriaQuery<T> criteriaQuery) {
+        return getCurrentSession().createQuery(criteriaQuery).getResultList();
+    }
+
     protected String getEntityName() {
         return getEntityClass().getName();
     }
 
     protected String getOrderByCondition(String attributeName) {
-        return String.format(SQL_ORDER_BY_CONDITION_PATTERN, attributeName);
+        return (attributeName == null || attributeName.isEmpty()) ? "" :
+                String.format(SQL_ORDER_BY_CONDITION_PATTERN, attributeName);
     }
 
     protected String getDefaultOrderByCondition() {
-        if (orderByCondition == null) {
-            orderByCondition = getOrderByCondition(getEntityIdAttributeName());
-        }
-
-        return orderByCondition;
+        return getOrderByCondition(getOrderByAttributeName());
     }
 
-    private EntityType<T> getEntityType() {
+    protected EntityType<T> getEntityType() {
         return sessionFactory.getMetamodel().entity(getEntityClass());
     }
 
@@ -150,7 +182,6 @@ public abstract class HDaoEntity<T> {
         // "non deprecated" method :( ; at least, don't understand how can use, for example,
         // sessionFactory.getMetamodel() approaching the same aim ...
         ClassMetadata classMetadata = sessionFactory.getClassMetadata(getEntityClass());
-        // ClassMetadata classMetadata = sessionFactory.getMetamodel().
         if (classMetadata instanceof AbstractEntityPersister) {  // And what I have to do if "not instnceof ..."?
             AbstractEntityPersister abstractEntityPersister = (AbstractEntityPersister) classMetadata;
             result = abstractEntityPersister.getTableName();
@@ -243,32 +274,62 @@ public abstract class HDaoEntity<T> {
         delete(findObjectByName(name));
     }
 
-    protected List<T> findObjects(String whereCondition) {
-        Query<T> query = getCurrentSession().createQuery(SqlExpressions.fromExpression(
-                getEntityName(), SqlExpressions.whereExpression(whereCondition),
-                getDefaultOrderByCondition()), getEntityClass());
+    private List<T> hqlFindAllObjects() {
+        return getCurrentSession().createQuery(SqlExpressions.fromExpression(
+                getEntityName(), getDefaultOrderByCondition()), getEntityClass()).list();
+    }
 
-        return query.list();
+    private List<T> criteriaFindAllObjects() {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder();
+        CriteriaQuery<T> criteriaQuery = createCriteriaQuery();
+        Root<T> rootEntity = criteriaQuery.from(getEntityType());
+
+        String orderByAttributeName = getOrderByAttributeName();
+        if (orderByAttributeName != null && !orderByAttributeName.isEmpty()) {
+            criteriaQuery.orderBy(criteriaBuilder.asc(rootEntity.get(orderByAttributeName)));
+        }
+
+        return getCriteriaQueryResultList(criteriaQuery);
     }
 
     protected List<T> findAllObjects() {
-        Query<T> query = getCurrentSession().createQuery(SqlExpressions.fromExpression(
-                getEntityName(), getDefaultOrderByCondition()), getEntityClass());
-
-        return query.list();
+        return useCriteriaQuery ? criteriaFindAllObjects() : hqlFindAllObjects();
     }
 
+    private List<T> hqlFindObjectsByAttributeValue(String attributeName, Object value) {
+        String orderByAttributeName = getOrderByAttributeName();
+        String orderByCondition = (orderByAttributeName != null && !orderByAttributeName.isEmpty() &&
+                !orderByAttributeName.equals(attributeName)) ? getOrderByCondition(getOrderByAttributeName()) : null;
 
-    protected List<T> findObjectsByAttributeValue(String attributeName, Object value) {
         Query<T> query = getCurrentSession().createQuery(SqlExpressions.fromExpressionWithFieldCondition(
-                getEntityName(), attributeName, String.format(":%s", attributeName)), getEntityClass());
+                getEntityName(), attributeName, String.format(":%s", attributeName), orderByCondition),
+                getEntityClass());
         query.setParameter(attributeName, value);
 
         return query.list();
     }
 
+    private List<T> criteriaFindObjectsByAttributeValue(String attributeName, Object value) {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder();
+        CriteriaQuery<T> criteriaQuery = createCriteriaQuery();
+        Root<T> rootEntity = criteriaQuery.from(getEntityType());
+        criteriaQuery.where(criteriaBuilder.equal(rootEntity.get(attributeName), value));
 
-    protected Set<T> findObjectSetByAttributeValue(String attributeName, Object value) {
+        String orderByAttributeName = getOrderByAttributeName();
+        if (orderByAttributeName != null && !orderByAttributeName.isEmpty() && !attributeName.equals(orderByAttributeName)) {
+            criteriaQuery.orderBy(criteriaBuilder.asc(rootEntity.get(orderByAttributeName)));
+        }
+
+        return getCriteriaQueryResultList(criteriaQuery);
+    }
+
+    protected List<T> findObjectsByAttributeValue(String attributeName, Object value) {
+        return useCriteriaQuery ? criteriaFindObjectsByAttributeValue(attributeName, value) :
+                hqlFindObjectsByAttributeValue(attributeName, value);
+    }
+
+
+    protected Set<T> findObjectSetByAttributeValue(String attributeName, com.company.restaurant.model.Course value) {
         HashSet<T> result = new HashSet<>();
         result.addAll(findObjectsByAttributeValue(attributeName, value));
 
@@ -276,7 +337,7 @@ public abstract class HDaoEntity<T> {
     }
 
 
-    protected T findObjectByAttributeValue(String attributeName, Object value) {
+    protected T findObjectByAttributeValue(String attributeName, Serializable value) {
         return getFirstFromList(findObjectsByAttributeValue(attributeName, value));
     }
 
@@ -288,10 +349,10 @@ public abstract class HDaoEntity<T> {
         return findObjectByAttributeValue(nameAttributeName, name);
     }
 
-    protected List<T> findObjectsByTwoAttributeValues(String attributeName1,
-                                                      Object value1,
-                                                      String attributeName2,
-                                                      Object value2) {
+    private List<T> hqlFindObjectsByTwoAttributeValues(String attributeName1,
+                                                       Object value1,
+                                                       String attributeName2,
+                                                       Object value2) {
         Query<T> query = getCurrentSession().createQuery(SqlExpressions.fromExpressionWithTwoFieldCondition(
                 getEntityName(), attributeName1, String.format(":%s", attributeName1), attributeName2,
                 String.format(":%s", attributeName2)), getEntityClass());
@@ -299,6 +360,28 @@ public abstract class HDaoEntity<T> {
         query.setParameter(attributeName2, value2);
 
         return query.list();
+    }
+
+    private List<T> criteriaFindObjectsByTwoAttributeValues(String attributeName1,
+                                                            Object value1,
+                                                            String attributeName2,
+                                                            Object value2) {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder();
+        CriteriaQuery<T> criteriaQuery = createCriteriaQuery();
+        Root<T> rootEntity = criteriaQuery.from(getEntityType());
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(rootEntity.get(attributeName1), value1),
+                criteriaBuilder.equal(rootEntity.get(attributeName2), value2)));
+
+        return getCriteriaQueryResultList(criteriaQuery);
+    }
+
+    protected List<T> findObjectsByTwoAttributeValues(String attributeName1,
+                                                      Object value1,
+                                                      String attributeName2,
+                                                      Object value2) {
+        return useCriteriaQuery ?
+                criteriaFindObjectsByTwoAttributeValues(attributeName1, value1, attributeName2, value2) :
+                hqlFindObjectsByTwoAttributeValues(attributeName1, value1, attributeName2, value2);
     }
 
     protected T findObjectByTwoAttributeValues(String attributeName1,

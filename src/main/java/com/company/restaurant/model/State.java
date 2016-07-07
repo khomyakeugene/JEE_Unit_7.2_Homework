@@ -13,4 +13,11 @@ public class State extends SimpleTypeDic {
     public void setStateType(String stateType) {
         setType(stateType);
     }
+
+    @Override
+    public String toString() {
+        return "State{" +
+                super.toString() +
+                "}";
+    }
 }

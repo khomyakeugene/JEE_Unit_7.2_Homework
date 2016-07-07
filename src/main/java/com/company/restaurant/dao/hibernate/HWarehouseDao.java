@@ -1,7 +1,6 @@
 package com.company.restaurant.dao.hibernate;
 
 import com.company.restaurant.dao.IngredientDao;
-import com.company.restaurant.dao.PortionDao;
 import com.company.restaurant.dao.WarehouseDao;
 import com.company.restaurant.dao.hibernate.proto.HDaoAmountLinkEntity;
 import com.company.restaurant.dao.proto.SqlExpressions;
@@ -11,6 +10,9 @@ import com.company.restaurant.model.Warehouse;
 import org.hibernate.query.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 
 /**
@@ -24,14 +26,9 @@ public class HWarehouseDao extends HDaoAmountLinkEntity<Warehouse> implements Wa
             String.format("%s < :%s", AMOUNT_ATTRIBUTE_NAME, AMOUNT_ATTRIBUTE_NAME);
 
     private IngredientDao ingredientDao;
-    private PortionDao portionDao;
 
     public void setIngredientDao(IngredientDao ingredientDao) {
         this.ingredientDao = ingredientDao;
-    }
-
-    public void setPortionDao(PortionDao portionDao) {
-        this.portionDao = portionDao;
     }
 
     @Override
@@ -62,7 +59,7 @@ public class HWarehouseDao extends HDaoAmountLinkEntity<Warehouse> implements Wa
 
     @Override
     protected void initMetadata() {
-        orderByCondition = getOrderByCondition(INGREDIENT_ATTRIBUTE_NAME);
+        orderByAttributeName = INGREDIENT_ATTRIBUTE_NAME;
         firstIdAttributeName = INGREDIENT_ATTRIBUTE_NAME;
         secondIdAttributeName = PORTION_ATTRIBUTE_NAME;
         linkDataAttributeName = AMOUNT_ATTRIBUTE_NAME;
@@ -109,14 +106,34 @@ public class HWarehouseDao extends HDaoAmountLinkEntity<Warehouse> implements Wa
         return findAllObjects();
     }
 
-    @Transactional
-    @Override
-    public List<Warehouse> findAllElapsingWarehouseIngredients(float limit) {
+    private List<Warehouse> hqlFindAllElapsingWarehouseIngredients(float limit) {
         Query<Warehouse> query = getCurrentSession().createQuery(SqlExpressions.fromExpression(
                 getEntityName(), SqlExpressions.whereExpression(SQL_ELAPSING_WAREHOUSE_INGREDIENTS),
                 getDefaultOrderByCondition()), Warehouse.class);
         query.setParameter(AMOUNT_ATTRIBUTE_NAME, limit);
 
         return query.list();
+    }
+
+    private List<Warehouse> criteriaFindAllElapsingWarehouseIngredients(float limit) {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder();
+        CriteriaQuery<Warehouse> criteriaQuery = createCriteriaQuery();
+        Root<Warehouse> rootEntity = criteriaQuery.from(getEntityType());
+        criteriaQuery.where(criteriaBuilder.lt(rootEntity.get(AMOUNT_ATTRIBUTE_NAME), limit));
+
+        String orderByAttributeName = getOrderByAttributeName();
+        if (orderByAttributeName != null && !orderByAttributeName.isEmpty()) {
+            criteriaQuery.orderBy(criteriaBuilder.asc(rootEntity.get(orderByAttributeName)));
+        }
+
+        return getCriteriaQueryResultList(criteriaQuery);
+    }
+
+    @Transactional
+    @Override
+    public List<Warehouse> findAllElapsingWarehouseIngredients(float limit) {
+        return isUseCriteriaQuery() ?
+                criteriaFindAllElapsingWarehouseIngredients(limit) :
+                hqlFindAllElapsingWarehouseIngredients(limit);
     }
 }
