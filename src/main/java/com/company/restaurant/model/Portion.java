@@ -1,9 +1,11 @@
 package com.company.restaurant.model;
 
+import java.io.Serializable;
+
 /**
  * Created by Yevhen on 24.05.2016.
  */
-public class Portion  {
+public class Portion implements Serializable {
     private int portionId;
     private Float amount;
     private String description;

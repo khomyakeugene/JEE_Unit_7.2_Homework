@@ -1,12 +1,13 @@
 package com.company.restaurant.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Created by Yevhen on 19.05.2016.
  */
-public class Course {
+public class Course implements Serializable {
     private int courseId;
     private String name;
     private Float weight;
